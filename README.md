@@ -14,4 +14,5 @@ install-interception.exe /install
 Notes:
 1. Dont forget to mark 'lib' directory as library cause programm uses property 'java.library.path'
 2. If you want to use mouse methods you had to turn off mouse acceleration.
-3. All methods tested on windows 10 with interceptor v.1.0.1
+3. All methods tested on windows 10 with interceptor v.1.0.1.
+4. There is also some documentation and you can generate java doc.
