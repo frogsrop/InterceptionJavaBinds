@@ -1,7 +1,7 @@
 package interception.java.binds.key.binds;
 
 public class InterceptionMouseState {
-    static int MOUSE_LEFT_BUTTON_DOWN = 0x001,
+    public static char MOUSE_LEFT_BUTTON_DOWN = 0x001,
             MOUSE_LEFT_BUTTON_UP = 0x002,
             MOUSE_RIGHT_BUTTON_DOWN = 0x004,
             MOUSE_RIGHT_BUTTON_UP = 0x008,

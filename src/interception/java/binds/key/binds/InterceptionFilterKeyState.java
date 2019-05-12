@@ -3,7 +3,7 @@ package interception.java.binds.key.binds;
 import static interception.java.binds.key.binds.InterceptionKeyState.*;
 
 public class InterceptionFilterKeyState {
-    static int FILTER_KEY_NONE = 0x0000,
+    public static int FILTER_KEY_NONE = 0x0000,
             FILTER_KEY_ALL = 0xFFFF,
             FILTER_KEY_DOWN = KEY_UP,
             FILTER_KEY_UP = KEY_UP << 1,

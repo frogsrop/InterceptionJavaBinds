@@ -3,7 +3,7 @@ package interception.java.binds.key.binds;
 import static interception.java.binds.key.binds.InterceptionMouseState.*;
 
 public class InterceptionFilterMouseState {
-    static int FILTER_MOUSE_NONE = 0x0000,
+    public static int FILTER_MOUSE_NONE = 0x0000,
             FILTER_MOUSE_ALL = 0xFFFF,
 
     FILTER_MOUSE_LEFT_BUTTON_DOWN = MOUSE_LEFT_BUTTON_DOWN,

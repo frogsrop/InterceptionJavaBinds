@@ -1,7 +1,7 @@
 package interception.java.binds.key.binds;
 
 public class Keys {
-    static char Escape = 1,
+    public static char Escape = 1,
             One = 2,
             Two = 3,
             Three = 4,
