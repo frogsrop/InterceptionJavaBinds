@@ -4,6 +4,8 @@ import com.sun.jna.*;
 import interception.java.binds.key.binds.Keys;
 
 import java.awt.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.function.Consumer;
 
 import static interception.java.binds.InterceptionLibraryBinds.*;
@@ -16,12 +18,13 @@ public class InterceptionImpl implements Interception {
 
     private boolean debug = false;
     private int inputSleep = 1;
-    private int mouseId = 12;
-    private int keyboardId = 2;
+    private int mouseId = -1;
+    private int keyboardId = -1;
 
     private Pointer context;
     private int awaitingTime = 100;
     private Thread thread;
+    private ConcurrentMap<Character, Boolean> keyPressed = new ConcurrentHashMap<>();
 
     private Consumer<MouseStroke> mouseModifier = x -> {
     };
@@ -67,6 +70,7 @@ public class InterceptionImpl implements Interception {
         thread.setPriority(10);
         thread.start();
         System.err.println("Loaded");
+        /*
         if (setKeyboardId() == -1) {
             keyboardId = 2;
         }
@@ -79,6 +83,7 @@ public class InterceptionImpl implements Interception {
         if (setMouseId() == -1) {
             mouseId = 12;
         }
+        */
     }
 
     @Override
@@ -127,6 +132,11 @@ public class InterceptionImpl implements Interception {
     }
 
     @Override
+    public boolean isKeyPressed(char key) {
+        return keyPressed.getOrDefault(key, false);
+    }
+
+    @Override
     public void pressLeftMouseButton() {
         MouseStroke mouse = new MouseStroke();
         mouse.state = 1;
@@ -141,7 +151,22 @@ public class InterceptionImpl implements Interception {
     }
 
     @Override
-    public void pressKey(char key) {
+    public void pressRightMouseButton() {
+        MouseStroke mouse = new MouseStroke();
+        mouse.state = (char) FILTER_MOUSE_RIGHT_BUTTON_DOWN;
+        interception_send(context, mouseId, mouse.toBytes(), 1);
+
+    }
+
+    @Override
+    public void releaseRightMouseButton() {
+        MouseStroke mouse = new MouseStroke();
+        mouse.state = (char) FILTER_MOUSE_RIGHT_BUTTON_UP;
+        interception_send(context, mouseId, mouse.toBytes(), 1);
+    }
+
+    @Override
+    public void pressId(char key) {
         KeyStroke keyStroke = new KeyStroke();
         keyStroke.code = key;
         keyStroke.state = KEY_DOWN;
@@ -149,7 +174,7 @@ public class InterceptionImpl implements Interception {
     }
 
     @Override
-    public void releaseKey(char key) {
+    public void releaseId(char key) {
         KeyStroke keyStroke = new KeyStroke();
         keyStroke.code = key;
         keyStroke.state = KEY_UP;
@@ -196,22 +221,22 @@ public class InterceptionImpl implements Interception {
                 , Keys.CommaLeftArrow, Keys.PeriodRightArrow, Keys.ForwardSlashQuestionMark, Keys.BackslashPipe
                 , Keys.Space, Keys.Enter, Keys.Tab};
         if (upprer) {
-            pressKey(Keys.LeftShift);
+            pressId(Keys.LeftShift);
         }
         try {
             Thread.sleep(inputSleep);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        pressKey(keys[chars.indexOf(c)]);
+        pressId(keys[chars.indexOf(c)]);
         try {
             Thread.sleep(inputSleep);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        releaseKey(keys[chars.indexOf(c)]);
+        releaseId(keys[chars.indexOf(c)]);
         if (upprer) {
-            releaseKey(Keys.LeftShift);
+            releaseId(Keys.LeftShift);
         }
     }
 
@@ -253,14 +278,29 @@ public class InterceptionImpl implements Interception {
             while (!Thread.interrupted()) {
                 byte[] stroke = new byte[STROKE_SIZE];
                 int current_id = interception_wait(context);
+                if (keyboardId == -1 && interception_is_keyboard(current_id) > 0) {
+                    keyboardId = current_id;
+                }
+                if (mouseId == -1 && interception_is_mouse(current_id) > 0) {
+                    mouseId = current_id;
+                }
+
                 if (current_id == keyboardId) {
                     if (interception_receive(context, keyboardId, stroke, 1) > 0) {
+
                         KeyStroke key = new KeyStroke(stroke);
                         keyModifier.accept(key);
+                        if (key.state == KEY_DOWN) {
+                            keyPressed.put(key.code, true);
+                        }
+                        if (key.state == KEY_UP) {
+                            keyPressed.put(key.code, false);
+                        }
                         if (debug) {
                             hookerKeyOut(key);
                         }
                         interception_send(context, keyboardId, key.toBytes(), 1);
+
                     }
                 } else if (current_id == mouseId) {
                     if (interception_receive(context, mouseId, stroke, 1) > 0) {

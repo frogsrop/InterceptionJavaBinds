@@ -94,6 +94,12 @@ public interface Interception {
     int setKeyboardId();
 
     /**
+     * Checks if key pressed.
+     * @return Return true if key pressed and false in other case.
+     */
+    boolean isKeyPressed(char key);
+
+    /**
      * Sets left mouse button to pressed state.
      */
     void pressLeftMouseButton();
@@ -104,6 +110,16 @@ public interface Interception {
     void releaseLeftMouseButton();
 
     /**
+     * Sets left mouse button to pressed state.
+     */
+    void pressRightMouseButton();
+
+    /**
+     * Sets left mouse button to released state.
+     */
+    void releaseRightMouseButton();
+
+    /**
      * Sets key button to pressed state.
      * <p>
      * Note: Be careful with this function because chars like 'a'-'z', '\', '+' etc. are not related to keys. Use instead {@link interception.java.binds.key.binds.Keys}
@@ -111,7 +127,7 @@ public interface Interception {
      * @param key Keyboard key id.
      * @see interception.java.binds.key.binds.Keys
      */
-    void pressKey(char key);
+    void pressId(char key);
 
     /**
      * Sets key button to released state.
@@ -121,7 +137,7 @@ public interface Interception {
      * @param key Keyboard key id.
      * @see interception.java.binds.key.binds.Keys
      */
-    void releaseKey(char key);
+    void releaseId(char key);
 
     /**
      * Move mouse on x, y coordinates.
@@ -160,5 +176,6 @@ public interface Interception {
      * @param text Text to write.
      */
     void writeText(String text);
+
 }
 
